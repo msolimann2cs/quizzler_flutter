@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:quizzler_flutter/quiz_main.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
+QuizMain quizBrain = QuizMain();
 
 void main() => runApp(Quizzler());
 
@@ -25,6 +29,38 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  List<Widget> score_keeper = [];
+
+  void AddRightAnswer() {
+    if (quizBrain.getQuestionNumber() == 0) {
+      score_keeper.clear();
+      Alert(context: context, title: "Quiz End", desc: "Restarting the quiz")
+          .show();
+    }
+    setState(() {
+      score_keeper.add(Icon(
+        Icons.check,
+        color: Colors.green,
+      ));
+      quizBrain.nextQuestion();
+    });
+  }
+
+  void AddWrongAnswer() {
+    if (quizBrain.getQuestionNumber() == 0) {
+      score_keeper.clear();
+      Alert(context: context, title: "Quiz End", desc: "Restarting the quiz")
+          .show();
+    }
+    setState(() {
+      score_keeper.add(Icon(
+        Icons.close,
+        color: Colors.red,
+      ));
+      quizBrain.nextQuestion();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -37,7 +73,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                'This is where the question text will go.',
+                quizBrain.getQuestionText(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -62,7 +98,19 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                //The user picked true.
+                bool correct_answer = quizBrain.getQuestionAnswer();
+                if (correct_answer == true) {
+                  AddRightAnswer();
+                } else {
+                  AddWrongAnswer();
+                }
+                // setState(() {
+                //   score_keeper.add(Icon(
+                //     Icons.check,
+                //     color: Colors.green,
+                //   ));
+                //   question_index++;
+                // });
               },
             ),
           ),
@@ -82,12 +130,19 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                //The user picked false.
+                bool correct_answer = quizBrain.getQuestionAnswer();
+                if (correct_answer == false) {
+                  AddRightAnswer();
+                } else {
+                  AddWrongAnswer();
+                }
               },
             ),
           ),
         ),
-        //TODO: Add a Row here as your score keeper
+        Row(
+          children: score_keeper,
+        ),
       ],
     );
   }
